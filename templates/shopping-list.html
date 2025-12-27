@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{url_for('static', filename='style.css')}}">
+</head>
+<body>
+    <div class="page-container">
+
+        <!-- Shopping list -->
+        <form action="/shopping/remove" method="post" class="card">
+            <h2 class="section-title">Shopping List</h2>
+
+            <div class="checkbox-list">
+                {% for d in data %}
+                <label class="checkbox-item">
+                    <input type="checkbox" name="{{d}}">
+                    <span>{{d}}</span>
+                </label>
+                {% endfor %}
+            </div>
+
+            <button type="submit" class="primary-button danger">Remove</button>
+        </form>
+
+        <!-- Add article -->
+        <form action="/shopping/add" method="post" class="card">
+            <h2 class="section-title">Add Item</h2>
+
+            <input
+                type="text"
+                name="article"
+                class="text-input"
+                placeholder="Enter article"
+                required
+            >
+
+            <button type="submit" class="primary-button">Add</button>
+        </form>
+
+        <!-- Logout -->
+        <form action="/logout" class="logout-form">
+            <button type="submit" class="secondary-button">Logout</button>
+        </form>
+
+    </div>
+</body>
+</html>

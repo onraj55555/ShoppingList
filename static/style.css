@@ -1,0 +1,149 @@
+/* =========================
+   Base reset & sizing
+   ========================= */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    background-color: #f2f2f2;
+    font-size: 16px;
+    color: #222;
+}
+
+/* =========================
+   Page container
+   ========================= */
+.page-container,
+.login-container {
+    min-height: 100vh;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1rem;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+/* =========================
+   Cards / sections
+   ========================= */
+.card,
+.login-form {
+    background: white;
+    padding: 1.25rem;
+    border-radius: 8px;
+}
+
+/* =========================
+   Titles
+   ========================= */
+.title {
+    font-size: 2rem;
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.section-title {
+    font-size: 1.4rem;
+    margin-bottom: 1rem;
+}
+
+/* =========================
+   Forms & inputs
+   ========================= */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1rem;
+}
+
+label {
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+}
+
+input[type="text"],
+input[type="password"],
+.text-input {
+    width: 100%;
+    padding: 0.75rem;
+    font-size: 1rem;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+/* =========================
+   Checkbox list
+   ========================= */
+.checkbox-list {
+    display: flex;
+    flex-direction: column; /* one per line */
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.checkbox-item {
+    display: flex;
+    align-items: center;
+    font-size: 1.3rem; /* larger item text */
+    width: 100%;
+}
+
+.checkbox-item input {
+    width: 1.4rem;
+    height: 1.4rem;
+    margin-right: 0.75rem;
+}
+
+/* =========================
+   Buttons
+   ========================= */
+.primary-button,
+.login-button {
+    width: 100%;
+    padding: 0.9rem;
+    font-size: 1.1rem;
+    border: none;
+    border-radius: 6px;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+}
+
+.primary-button.danger {
+    background-color: #dc3545;
+}
+
+.secondary-button {
+    width: 100%;
+    padding: 0.8rem;
+    font-size: 1rem;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    background: white;
+    cursor: pointer;
+}
+
+/* =========================
+   Tap feedback
+   ========================= */
+button:active {
+    opacity: 0.9;
+}
+
+/* =========================
+   Small screens fine-tuning
+   ========================= */
+@media (max-width: 360px) {
+    .title {
+        font-size: 1.7rem;
+    }
+
+    .checkbox-item {
+        font-size: 1.2rem;
+    }
+}
