@@ -3,10 +3,12 @@ from flask import Flask, render_template, request, url_for, redirect
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required
 from werkzeug.security import check_password_hash
-
+# from flask_socketio import SocketIO, send, emit, join_room, leave_room
 
 app = Flask(__name__)
 app.config.from_pyfile("config.py", silent=True)
+
+# socketio = SocketIO(app)
 
 db = SQLAlchemy(app)
 login_manager = LoginManager()
@@ -19,12 +21,14 @@ class Users(UserMixin, db.Model):
     password = db.Column(db.String(250), nullable=False)
 
 data_file_name = "data"
+room = "global"
 
 def read_from_file():
     with open(data_file_name, 'r') as f:
         return f.read().split()
 
 data = read_from_file()
+session_ids = set()
 
 def save_to_file():
     with open(data_file_name, 'w') as f:
@@ -48,6 +52,23 @@ with app.app_context():
 @login_manager.user_loader
 def load_user(user_id):
     return Users.query.get(int(user_id))
+
+# @socketio.on('join')
+# @login_required
+# def handle_join():
+#     session_ids.add(request.sid)
+#     join_room(room, sid=request.sid)
+#     emit('message', data, broadcast=False) # Only notify the new client with the data
+#
+# @socketio.on('message')
+# @login_required
+# def handle_message(msg):
+#     emit('message', data, broadcast=False)
+#
+# @socketio.on('disconnect')
+# @login_required
+# def handle_disconnect():
+#     session_ids.remove(request.sid)
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -88,7 +109,12 @@ def shopping(action = None):
             remove_article(articles_to_remove)
         return redirect(url_for("shopping"))
 
-    return render_template("shopping-list.html", data=data)
+    return render_template("shopping-list.html")
+
+@app.route("/api/data")
+@login_required
+def api_data():
+    return data
 
 @app.route("/")
 def home():
@@ -96,5 +122,5 @@ def home():
 
 if __name__ == '__main__':
     from waitress import serve
-    serve(app, host="0.0.0.0", port=8080)
-    #app.run(host="0.0.0.0", port=8080, debug=True)
+    #serve(socketio, host="0.0.0.0", port=8080)
+    app.run(host="0.0.0.0", port=8080, debug=True)

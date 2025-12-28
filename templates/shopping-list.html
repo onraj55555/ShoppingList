@@ -11,13 +11,7 @@
         <form action="/shopping/remove" method="post" class="card">
             <h2 class="section-title">Shopping List</h2>
 
-            <div class="checkbox-list">
-                {% for d in data %}
-                <label class="checkbox-item">
-                    <input type="checkbox" name="{{d}}">
-                    <span>{{d}}</span>
-                </label>
-                {% endfor %}
+            <div class="checkbox-list" id="items">
             </div>
 
             <button type="submit" class="primary-button danger">Remove</button>
@@ -44,5 +38,53 @@
         </form>
 
     </div>
+
+    <script>
+        let prev_data = [];
+
+        function make_item(item_name) {
+            let label = document.createElement('label')
+            label.class = 'checkbox-list';
+            let input = document.createElement('input');
+            input.type = 'checkbox';
+            input.name = item_name;
+
+            //if(document.getElementsByName(item_name)[0].checked) {
+            //    input.checked = true; // Preserve state
+            //}
+
+            let span = document.createElement('span');
+            span.innerHTML = item_name;
+
+            label.appendChild(input);
+            label.appendChild(span);
+
+            return label;
+        }
+
+        function update_ui() {
+            let checkbox = document.getElementById('items');
+            checkbox.innerHTML = ''; // removing all children
+            for(const d of prev_data) {
+                checkbox.appendChild(make_item(d));
+            }
+        }
+
+        async function fetch_data() {
+            const response = await fetch('/api/data');
+
+            if(!response.ok) return;
+
+            const data = await response.json();
+        
+            if(JSON.stringify(prev_data) != JSON.stringify(data)) {
+                console.log("Updating UI");
+                prev_data = data;
+                update_ui();
+            }
+        }
+
+        const interval = setInterval(fetch_data, 1000);
+    </script>
 </body>
 </html>
