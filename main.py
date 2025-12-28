@@ -32,7 +32,7 @@ session_ids = set()
 
 def save_to_file():
     with open(data_file_name, 'w') as f:
-        f.write(" ".join(data))
+        f.write("\n".join(data))
 
 
 def add_article(article):
