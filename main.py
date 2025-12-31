@@ -36,6 +36,13 @@ def save_to_file():
 
 
 def add_article(article):
+    # SANITISE THE INPUT (to prevent possible injection attacks in the future)
+    for i in range(len(article)):
+        c = str(article[i])
+        if c.isalnum() or c == "-" or c == "(" or c == ")" or c == "_" or c == ".":
+            pass
+        else:
+            article = article.replace(c, "_")
     if data.count(article) == 0:
         data.append(article)
         save_to_file()
