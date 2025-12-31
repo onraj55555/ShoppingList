@@ -1,17 +1,3 @@
-<!--<!DOCTYPE>
-<head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{{url_for('static', filename='style.css')}}">
-</head>
-<body>
-    <h1>Login</h1>
-    <form action="/login" method="post">
-        <p><label for="username">Username:</label> <input type="text" name="username" required /></p>
-        <p></p-><label for="password">Password:</label><input type="password" name="password" required /></p>
-        <p><button type="submit">Login</button></p>
-    </form>
-</body>-->
-
 <!DOCTYPE html>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -35,4 +21,11 @@
             <button type="submit" class="login-button">Login</button>
         </form>
     </div>
+
+    <script>
+        const wrong_credentials = {{ wrong_credentials }};
+        if(wrong_credentials) {
+            alert("Wrong credentials!");
+        }
+    </script>
 </body>

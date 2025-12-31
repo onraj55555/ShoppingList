@@ -82,8 +82,8 @@ def login():
             login_user(user)
             return redirect(url_for("shopping"))
         else:
-            return render_template("login.html")
-    return render_template("login.html")
+            return render_template("login.html", wrong_credentials="true")
+    return render_template("login.html", wrong_credentials="false")
 
 @app.route("/logout")
 @login_required
