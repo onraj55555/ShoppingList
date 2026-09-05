@@ -3,7 +3,10 @@ from flask import Flask, render_template, request, url_for, redirect
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required
 from werkzeug.security import check_password_hash
-# from flask_socketio import SocketIO, send, emit, join_room, leave_room
+import datetime
+import config
+
+import sqlite3
 
 app = Flask(__name__)
 app.config.from_pyfile("config.py", silent=True)
@@ -20,38 +23,36 @@ class Users(UserMixin, db.Model):
     username = db.Column(db.String(250), unique=True, nullable=False)
     password = db.Column(db.String(250), nullable=False)
 
-data_file_name = "data"
-room = "global"
-
-def read_from_file():
-    with open(data_file_name, 'r') as f:
-        return f.read().split()
-
-data = read_from_file()
-session_ids = set()
-
-def save_to_file():
-    with open(data_file_name, 'w') as f:
-        f.write("\n".join(data))
-
+with sqlite3.connect(config.ARTICLES_NAME) as connection:
+    cursor = connection.cursor();
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS articles (
+        name TEXT PRIMARY KEY NOT NULL,
+        creation_time DATETIME
+    );
+    """)
+    connection.commit()
 
 def add_article(article):
-    # SANITISE THE INPUT (to prevent possible injection attacks in the future)
-    for i in range(len(article)):
-        c = str(article[i])
-        if c.isalnum() or c == "-" or c == "(" or c == ")" or c == "_" or c == ".":
-            pass
-        else:
-            article = article.replace(c, "_")
-    if data.count(article) == 0:
-        data.append(article)
-        save_to_file()
+    current_time = str(datetime.datetime.now().replace(microsecond=0))
+
+    try:
+        with sqlite3.connect(config.ARTICLES_NAME) as connection:
+            cursor = connection.cursor()
+            cursor.execute("INSERT INTO articles (name, creation_time) VALUES (?, ?);", (article, current_time))
+            connection.commit()
+    except sqlite3.Error as e:
+        print(f"DB error in add_article: {e}")
 
 def remove_article(articles):
-    for article in articles:
-        if data.count(article) != 0:
-            data.remove(article)
-        save_to_file()
+    with sqlite3.connect(config.ARTICLES_NAME) as connection:
+        cursor = connection.cursor()
+        for article in articles:
+            try:
+                cursor.execute("DELETE FROM articles WHERE name = ?;", (article,))
+                connection.commit()
+            except sqlite3.Error as e:
+                print(f"Error while trying to delete item {article}: {e}")
 
 with app.app_context():
     db.create_all()
@@ -59,23 +60,6 @@ with app.app_context():
 @login_manager.user_loader
 def load_user(user_id):
     return Users.query.get(int(user_id))
-
-# @socketio.on('join')
-# @login_required
-# def handle_join():
-#     session_ids.add(request.sid)
-#     join_room(room, sid=request.sid)
-#     emit('message', data, broadcast=False) # Only notify the new client with the data
-#
-# @socketio.on('message')
-# @login_required
-# def handle_message(msg):
-#     emit('message', data, broadcast=False)
-#
-# @socketio.on('disconnect')
-# @login_required
-# def handle_disconnect():
-#     session_ids.remove(request.sid)
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -109,10 +93,8 @@ def shopping(action = None):
                 add_article(article)
         if action == "remove":
             articles_to_remove = []
-            for d in data:
-                t = request.form.get(d)
-                if t != None:
-                    articles_to_remove.append(d)
+            for entry in request.form:
+                articles_to_remove.append(entry.strip())
             remove_article(articles_to_remove)
         return redirect(url_for("shopping"))
 
@@ -121,7 +103,11 @@ def shopping(action = None):
 @app.route("/api/data")
 @login_required
 def api_data():
-    return data
+    with sqlite3.connect(config.ARTICLES_NAME) as connection:
+        cursor = connection.cursor()
+        cursor.execute(f"SELECT name FROM articles;")
+        rows = cursor.fetchall()
+    return rows
 
 @app.route("/")
 def home():
